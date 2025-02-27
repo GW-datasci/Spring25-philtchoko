@@ -1,0 +1,67 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-02-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+
+library(worldfootballR)
+
+mapped_players <- player_dictionary_mapping()
+
+
+```
+
+
+```{r}
+#transfer market values
+
+prem_player_market_values <- tm_player_market_values("England", 2023)
+
+
+
+
+
+```
+
+```{r}
+# important bio data for players
+
+league_urls <- fb_league_urls(country = "ENG", gender = "M", season_end_year = 2024, tier = "1st")
+
+team_urls <- fb_teams_urls(league_urls)
+
+prem_stats <- fb_team_player_stats(team_urls, "standard", time_pause = 7)
+
+```
+
+```{r}
+
+# prem stats related to shooting
+
+prem_defense <- fb_team_player_stats(team_urls, "defense", time_pause = 6)
+
+```
+
+
+```{r}
+prem_passing <- fb_team_player_stats(team_urls, "passing", time_pause = 6)
+
+```
+
+
+
+```
+
+```{r}
+
+head(prem_stats)
+
+```
