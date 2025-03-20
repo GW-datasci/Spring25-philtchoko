@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Philippe Tchokokam Transfer Market Capstone"
 output: html_document
 date: "2025-02-25"
 ---
@@ -12,9 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 
-library(worldfootballR)
+#library(worldfootballR)
 
-mapped_players <- player_dictionary_mapping()
+#mapped_players <- player_dictionary_mapping()
 
 
 ```
@@ -23,9 +23,8 @@ mapped_players <- player_dictionary_mapping()
 ```{r}
 #transfer market values
 
-prem_player_market_values <- tm_player_market_values("England", 2023)
-
-
+top50_prem <- read.csv("/Users/philtchoko/Desktop/DATS4001/top50_prem_prices.csv")
+top50_prem <- subset(top50_prem, select = -c(X, X.1))
 
 
 
@@ -44,7 +43,7 @@ prem_stats <- fb_team_player_stats(team_urls, "standard", time_pause = 7)
 
 ```{r}
 
-# prem stats related to shooting
+# prem stats related to shootings
 
 prem_defense <- fb_team_player_stats(team_urls, "defense", time_pause = 6)
 
@@ -57,11 +56,64 @@ prem_passing <- fb_team_player_stats(team_urls, "passing", time_pause = 6)
 ```
 
 
+```{r}
+# performing inner join between transfer market values and statistical data
+
+library(dplyr)
+
+prem_stats$Age <- as.numeric(prem_stats$Age)
+
+
+stats_market_vals <- inner_join(top50_prem, prem_stats, by=c("Player"))
+
+passing_stats_market_vals <- inner_join(top50_prem, prem_passing, by=c("Player"))
+
+defense_stats_market_vals <- inner_join(top50_prem, prem_defense, by=c("Player"))
+
+
+#cleaning column names
+
+stats_market_vals <- subset(stats_market_vals, select = -c(Age.y, Pos, Squad))
+cols_to_remove <- grep("Per_Minutes$", colnames(stats_market_vals))
+
+stats_market_vals <- stats_market_vals[, -cols_to_remove]
+
+defense_stats_market_vals <- subset(defense_stats_market_vals, select = -c(Age.y, Pos, Squad))
+
+
+
+
+passing_stats_market_vals <- subset(passing_stats_market_vals, select = -c(Age.y, Pos, Squad))
+
+
 
 ```
 
-```{r}
 
-head(prem_stats)
+```{r}
+#performing correlation plot on data
+
+num_stats_market_vals <- subset(stats_market_vals, select = -c(Team, Player, Position, Season, Comp, Nation, PlayerURL, MP_Playing_Time))
+
+num_def_stats_market_vals <- subset(defense_stats_market_vals, select = -c(Team, Player, Position, Season, Comp, Nation, PlayerURL))
+
+num_passing_stats_market_vals <- subset(passing_stats_market_vals, select = -c(Team, Player, Position, Season, Comp, Nation, PlayerURL))
+
+
+cor_stats_market_vals <- cor(num_stats_market_vals)
+
+cor_def_market_vals <- cor(num_def_stats_market_vals)
+
+cor_pass_market_vals <- cor(num_passing_stats_market_vals)
+
+
+library(corrplot)
+
+
+corrplot(cor_stats_market_vals)
+
+corrplot(cor_def_market_vals)
+
+corrplot(cor_pass_market_vals)
 
 ```
